@@ -15,6 +15,7 @@ for i = 1:4
     pst1.simulateWalk(P, N);
 end
 
+
 % PART 2
 
 bins = [ 20, 10, 40 ];

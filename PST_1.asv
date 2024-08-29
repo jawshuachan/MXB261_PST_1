@@ -1,6 +1,6 @@
 classdef PST_1
     methods
-        function simulateWalk(P, N)
+        function simulateWalk(obj, P, N)
 
             % Define starting position
             if P == 1
@@ -94,37 +94,44 @@ classdef PST_1
                 xlim([1 gridSize]);
             end
         end
-        function samplingExperimentalData(B)
-                
+
+        function sampleExperimentalData(obj, B)
+            
             data = load('sampledata2024.mat');
             sampledata = data.Data0;
             
             % Probability Distribution and CDF function for Data0
-            numbins = 20;
+            numbins = B;
             
             [counts, edges] = histcounts(sampledata, numbins, 'Normalization', 'probability');
-            binWidth = edges(2) - edges(1);
             
-            cdf_values = cumsum(counts) * binWidth;
-            cdf_function = @(x) interp1(edges(2:end), cdf_values, x, 'linear', 'extrap');
+            cdf_values = cumsum(counts);
+            cdf_values = cdf_values / max(cdf_values);
             
-            % Dataset DataNew
+            % Dataset - DataNew
             rng(20);
             u = rand(1, 1000);
+
+            DataNew = interp1(cdf_values, edges(2:end), u, 'linear', 'extrap'); % interpolate random numbers with 
             
             figure;
             
             subplot(1, 2, 1)
-            histogram(sampledata, 20, 'Normalization', 'probability');
+            histogram(sampledata, numbins, 'Normalization', 'probability');
             title('Probability Distribution of Data0')
             xlabel('Value')
             ylabel('Probability')
             
             subplot(1, 2, 2)
-            histogram(DataNew, 20, 'Normalization', 'probability');
+            histogram(DataNew, numbins, 'Normalization', 'probability');
             title('Probability Distribution of DataNew')
             xlabel('Value')
             ylabel('Probability')
+
+            % Kullback-Leibler Divergence
+            pCount = histcounts(sampledata, edges, 'Normalization', 'probability')
+            DK1 = sum(log)
+
         end
     end
 end

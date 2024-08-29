@@ -108,25 +108,41 @@ classdef PST_1
             cdf_values = cumsum(counts);
             cdf_values = cdf_values / max(cdf_values);
             
-            % Dataset DataNew
+            % Dataset - DataNew
             rng(20);
             u = rand(1, 1000);
 
-            DataNew = interp1(cdf_values, edges(2:end), u, 'linear', 'extrap');
+            DataNew = interp1(cdf_values, edges(2:end), u, 'linear', 'extrap'); % interpolate random numbers with 
             
             figure;
             
             subplot(1, 2, 1)
-            histogram(sampledata, 20, 'Normalization', 'probability');
+            histogram(sampledata, numbins, 'Normalization', 'probability');
             title('Probability Distribution of Data0')
             xlabel('Value')
             ylabel('Probability')
             
             subplot(1, 2, 2)
-            histogram(DataNew, 20, 'Normalization', 'probability');
+            histogram(DataNew, numbins, 'Normalization', 'probability');
             title('Probability Distribution of DataNew')
             xlabel('Value')
             ylabel('Probability')
+
+            % Kullback-Leibler Divergence
+            pCount = histcounts(sampledata, edges, 'Normalization', 'probability');
+            qCount = histcounts(DataNew, edges, 'Normalization', 'probability');
+
+            idx = pCount > 0 & qCount > 0;
+            
+            P = pCount(idx);
+            Q = qCount(idx);
+
+            DK1 = sum(P .* log(P./Q));
+            DK2 = sum(Q .* log(Q./P));
+
+            disp(['KL divergence Data0 to DataNew: ', num2str(DK1)]);
+            disp(['KL divergence DataNew to Data0: ', num2str(DK2)]);
+
         end
     end
 end
